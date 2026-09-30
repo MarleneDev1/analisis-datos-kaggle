@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marlene · Portafolio de datos</title>
+<meta name="description" content="Portafolio de análisis de datos de Marlene: EDA del dataset Language Learning Fluency de Kaggle.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  // Los colores de Tailwind apuntan a variables CSS, así el tema claro/oscuro se resuelve en :root
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bg: "var(--bg)", surface: "var(--surface)", ink: "var(--ink)", muted: "var(--muted)",
+          line: "var(--line)", accent: "var(--accent)", "accent-soft": "var(--accent-soft)",
+          fluent: "var(--series-fluent)", dropout: "var(--series-dropout)", plate: "var(--plate)",
+        },
+        fontFamily: {
+          display: ['"Bricolage Grotesque"', "ui-sans-serif", "system-ui", "sans-serif"],
+          sans: ['"IBM Plex Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+          mono: ['"IBM Plex Mono"', "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  /* Layout: columna única de lectura (max 72rem); la tarjeta del proyecto se abre en dos columnas en escritorio */
+  :root {
+    --bg: #f4f6f5;
+    --surface: #fcfcfb;
+    --ink: #17221f;
+    --muted: #5b6863;
+    --line: #dbe2df;
+    --accent: #007a6e;
+    --accent-soft: #e0efec;
+    --series-fluent: #008a7c;
+    --series-dropout: #c9542a;
+    --plate: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121816; --surface: #1a1a19; --ink: #e6ecea; --muted: #9aa8a3; --line: #2c3633;
+      --accent: #4cc2b2; --accent-soft: #1d2f2b; --series-fluent: #2aa596; --series-dropout: #d9703f;
+      --plate: #f4f6f5; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121816; --surface: #1a1a19; --ink: #e6ecea; --muted: #9aa8a3; --line: #2c3633;
+    --accent: #4cc2b2; --accent-soft: #1d2f2b; --series-fluent: #2aa596; --series-dropout: #d9703f;
+    --plate: #f4f6f5; color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+  h1, h2, h3 { text-wrap: balance; }
+  .num { font-variant-numeric: tabular-nums; }
+  .eyebrow { letter-spacing: 0.12em; text-transform: uppercase; }
+  a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px;
+  }
+  /* Barras de la gráfica: extremo de datos redondeado, anclado a la línea base */
+  .bar { border-radius: 4px 4px 0 0; transition: opacity .15s ease; }
+  .chart:hover .bar { opacity: .45; }
+  .chart .bar:hover, .chart .bar:focus-visible { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+</style>
+</head>
+<body class="min-h-screen">
+<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+  <!-- Barra superior -->
+  <nav class="flex flex-wrap items-center justify-between gap-3 py-6 text-sm">
+    <a href="#inicio" class="font-display text-lg font-bold tracking-tight text-ink">Marlene<span class="text-accent">.</span>datos</a>
+    <div class="flex items-center gap-5 text-muted">
+      <a href="#proyectos" class="hover:text-ink">Proyectos</a>
+      <a href="https://github.com/MarleneDev1" target="_blank" rel="noopener" class="hover:text-ink">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- Encabezado: sobre mí. Edita el texto para que hable de ti. -->
+  <header id="inicio" class="grid gap-10 border-b border-line pb-14 pt-8 md:grid-cols-[1.4fr_1fr] md:items-end">
+    <div class="min-w-0">
+      <p class="eyebrow mb-4 font-mono text-xs text-accent">Análisis de datos · Python</p>
+      <h1 class="font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
+        Hola, soy Marlene. Convierto datos en respuestas claras.
+      </h1>
+      <p class="mt-6 max-w-[62ch] text-base leading-relaxed text-muted sm:text-lg">
+        Me interesa el análisis exploratorio: revisar la calidad de los datos, encontrar las variables
+        que importan y explicar lo que dicen con gráficas sencillas. Aquí reúno mis proyectos con datasets
+        públicos de Kaggle, cada uno con su código reproducible en GitHub.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="#proyectos" class="rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-surface hover:opacity-90">Ver proyectos</a>
+        <a href="https://github.com/MarleneDev1" target="_blank" rel="noopener" class="rounded-md border border-line px-5 py-2.5 text-sm font-semibold text-ink hover:border-accent">github.com/MarleneDev1</a>
+      </div>
+    </div>
+    <dl class="grid grid-cols-2 gap-x-6 gap-y-5 font-mono text-sm">
+      <div class="col-span-2">
+        <dt class="eyebrow text-[11px] text-muted">Herramientas</dt>
+        <dd class="mt-2 flex flex-wrap gap-2">
+          <span class="rounded bg-accent-soft px-2 py-1 text-accent">Python</span>
+          <span class="rounded bg-accent-soft px-2 py-1 text-accent">pandas</span>
+          <span class="rounded bg-accent-soft px-2 py-1 text-accent">matplotlib</span>
+          <span class="rounded bg-accent-soft px-2 py-1 text-accent">seaborn</span>
+          <span class="rounded bg-accent-soft px-2 py-1 text-accent">scikit-learn</span>
+          <span class="rounded bg-accent-soft px-2 py-1 text-accent">Git</span>
+        </dd>
+      </div>
+      <div>
+        <dt class="eyebrow text-[11px] text-muted">Enfoque</dt>
+        <dd class="mt-1 text-ink">EDA y visualización</dd>
+      </div>
+      <div>
+        <dt class="eyebrow text-[11px] text-muted">Fuente de datos</dt>
+        <dd class="mt-1 text-ink">Kaggle</dd>
+      </div>
+    </dl>
+  </header>
+
+  <!-- Proyectos -->
+  <main id="proyectos" class="py-14">
+    <div class="mb-8 flex flex-wrap items-baseline justify-between gap-2">
+      <h2 class="font-display text-3xl font-bold tracking-tight">Proyectos</h2>
+      <p class="font-mono text-xs text-muted">1 proyecto publicado</p>
+    </div>
+
+    <!-- Tarjeta: Language Learning Fluency -->
+    <article class="overflow-hidden rounded-xl border border-line bg-surface">
+      <div class="border-b border-line p-6 sm:p-8">
+        <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+          <span class="eyebrow rounded bg-accent-soft px-2 py-1 text-accent">EDA</span>
+          <span class="eyebrow rounded border border-line px-2 py-1 text-muted">Kaggle</span>
+          <span class="eyebrow rounded border border-line px-2 py-1 text-muted">Clasificación binaria</span>
+        </div>
+        <h3 class="mt-4 font-display text-2xl font-bold tracking-tight sm:text-3xl">¿Qué hace que alguien llegue a hablar un idioma con fluidez?</h3>
+        <p class="mt-3 max-w-[65ch] leading-relaxed text-muted">
+          Análisis exploratorio del dataset <em>Language Learning Fluency</em>: 45.000 personas que estudian
+          un idioma, con sus horas de estudio, la dificultad del idioma según la escala FSI y la calidad de su práctica.
+          Busco qué variables explican que alguien alcance el nivel B2 del MCER o abandone antes.
+        </p>
+
+        <!-- Métricas -->
+        <dl class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-4">
+          <div class="bg-surface p-4">
+            <dt class="text-xs text-muted">Aprendices</dt>
+            <dd class="num mt-1 font-display text-2xl font-bold sm:text-3xl">45.000</dd>
+            <dd class="mt-1 font-mono text-[11px] text-muted">18 variables</dd>
+          </div>
+          <div class="bg-surface p-4">
+            <dt class="text-xs text-muted">Valores faltantes</dt>
+            <dd class="num mt-1 font-display text-2xl font-bold sm:text-3xl">0</dd>
+            <dd class="mt-1 font-mono text-[11px] text-muted">0 duplicados</dd>
+          </div>
+          <div class="bg-surface p-4">
+            <dt class="text-xs text-muted">Llegan a B2 o más</dt>
+            <dd class="num mt-1 font-display text-2xl font-bold sm:text-3xl">35,8&nbsp;%</dd>
+            <dd class="mt-1 font-mono text-[11px] text-muted">abandonan: 37,1&nbsp;%</dd>
+          </div>
+          <div class="bg-surface p-4">
+            <dt class="text-xs text-muted">Precisión del modelo</dt>
+            <dd class="num mt-1 font-display text-2xl font-bold sm:text-3xl">89&nbsp;%</dd>
+            <dd class="mt-1 font-mono text-[11px] text-muted">base: 64&nbsp;% · Random Forest</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="grid lg:grid-cols-[1.15fr_1fr]">
+        <!-- Gráfica interactiva -->
+        <section class="min-w-0 border-b border-line p-6 sm:p-8 lg:border-b-0 lg:border-r" aria-labelledby="chart-title">
+          <h4 id="chart-title" class="font-display text-lg font-bold">La dificultad del idioma lo cambia todo</h4>
+          <p class="mt-1 text-sm text-muted">Porcentaje de aprendices que llegan a B2 y que abandonan, según la categoría FSI del idioma (1 = fácil, como el español; 4 = difícil, como el mandarín).</p>
+
+          <ul class="mt-5 flex flex-wrap gap-5 text-sm" aria-label="Leyenda">
+            <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm bg-fluent"></span>Llegan a B2 o más</li>
+            <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm bg-dropout"></span>Abandonan</li>
+          </ul>
+
+          <div class="relative mt-4" id="chart-wrap">
+            <div class="grid grid-cols-[2.25rem_1fr] gap-2">
+              <!-- Eje Y: 0–60 % -->
+              <div class="relative h-56 font-mono text-[11px] text-muted num" aria-hidden="true">
+                <span class="absolute right-0 top-0 -translate-y-1/2">60&nbsp;%</span>
+                <span class="absolute right-0 top-1/3 -translate-y-1/2">40&nbsp;%</span>
+                <span class="absolute right-0 top-2/3 -translate-y-1/2">20&nbsp;%</span>
+                <span class="absolute bottom-0 right-0 translate-y-1/2">0&nbsp;%</span>
+              </div>
+              <div class="relative h-56">
+                <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+                  <div class="absolute inset-x-0 top-0 border-t border-dashed border-line"></div>
+                  <div class="absolute inset-x-0 top-1/3 border-t border-dashed border-line"></div>
+                  <div class="absolute inset-x-0 top-2/3 border-t border-dashed border-line"></div>
+                  <div class="absolute inset-x-0 bottom-0 border-t border-muted"></div>
+                </div>
+                <div id="chart" class="chart relative flex h-full items-end justify-around gap-3" role="img"
+                     aria-label="Gráfico de barras: tasa de fluidez y de abandono por categoría FSI"></div>
+              </div>
+            </div>
+            <div class="mt-2 grid grid-cols-[2.25rem_1fr] gap-2">
+              <span></span>
+              <div id="chart-x" class="flex justify-around gap-3 font-mono text-xs text-muted"></div>
+            </div>
+            <div id="tooltip" hidden class="pointer-events-none absolute z-10 rounded-md border border-line bg-surface px-3 py-2 text-xs shadow-lg"></div>
+          </div>
+
+          <details class="mt-6 text-sm">
+            <summary class="cursor-pointer text-muted hover:text-ink">Ver los datos en tabla</summary>
+            <div class="mt-3 overflow-x-auto">
+              <table class="num w-full text-left font-mono text-xs">
+                <thead class="text-muted"><tr class="border-b border-line"><th class="py-2 pr-4 font-medium">FSI</th><th class="py-2 pr-4 font-medium">Aprendices</th><th class="py-2 pr-4 font-medium">Llegan a B2</th><th class="py-2 font-medium">Abandonan</th></tr></thead>
+                <tbody id="chart-table"></tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <!-- Hallazgos -->
+        <section class="min-w-0 p-6 sm:p-8" aria-labelledby="findings-title">
+          <h4 id="findings-title" class="font-display text-lg font-bold">Lo que encontré</h4>
+          <ul class="mt-4 space-y-4 text-sm leading-relaxed">
+            <li class="border-l-2 border-line pl-4">
+              <strong class="text-ink">Las horas de estudio son el factor más importante.</strong>
+              <span class="text-muted">Con 580–700 h llega a B2 el 80&nbsp;% en idiomas FSI 1, pero solo el 7&nbsp;% en FSI 4.</span>
+            </li>
+            <li class="border-l-2 border-line pl-4">
+              <strong class="text-ink">La calidad de la práctica también cuenta.</strong>
+              <span class="text-muted">A igual número de horas, quien practica más de forma activa llega a la fluidez con más frecuencia.</span>
+            </li>
+            <li class="border-l-2 border-line pl-4">
+              <strong class="text-ink">La motivación predice el abandono, no la fluidez.</strong>
+              <span class="text-muted">Motivación y constancia tienen correlación casi nula con llegar a B2 (ρ ≈ 0), pero sí con abandonar (ρ ≈ −0,14).</span>
+            </li>
+            <li class="border-l-2 border-line pl-4">
+              <strong class="text-ink">La edad influye en el acento, no en la fluidez.</strong>
+              <span class="text-muted">El acento nativo baja de 8,0 a 3,1 sobre 10 según la edad de inicio; la tasa de fluidez se mantiene en ≈ 36&nbsp;%.</span>
+            </li>
+            <li class="border-l-2 border-line pl-4">
+              <strong class="text-ink">Evité una fuga de datos.</strong>
+              <span class="text-muted"><code class="font-mono text-xs">cefr_level</code> coincide al 100&nbsp;% con la variable objetivo, así que lo dejé fuera del modelo.</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <!-- Galería de gráficas generadas por el script -->
+      <section class="border-t border-line p-6 sm:p-8" aria-labelledby="gallery-title">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h4 id="gallery-title" class="font-display text-lg font-bold">Gráficas del análisis</h4>
+          <p class="font-mono text-xs text-muted">4 de 13 · generadas con matplotlib y seaborn</p>
+        </div>
+        <div class="mt-5 grid gap-5 sm:grid-cols-2">
+          <figure class="min-w-0">
+            <a href="outputs/figures/09_fluidez_horas_fsi.png" target="_blank" rel="noopener" class="block overflow-hidden rounded-lg border border-line bg-plate p-2 hover:border-accent">
+              <img src="outputs/figures/09_fluidez_horas_fsi.png" alt="Líneas de tasa de fluidez por deciles de horas de estudio, una por categoría FSI" loading="lazy" class="w-full">
+            </a>
+            <figcaption class="mt-2 text-xs text-muted">Fluidez según horas de estudio y dificultad del idioma.</figcaption>
+          </figure>
+          <figure class="min-w-0">
+            <a href="outputs/figures/13_importancia_variables.png" target="_blank" rel="noopener" class="block overflow-hidden rounded-lg border border-line bg-plate p-2 hover:border-accent">
+              <img src="outputs/figures/13_importancia_variables.png" alt="Barras horizontales de importancia por permutación para fluidez y abandono" loading="lazy" class="w-full">
+            </a>
+            <figcaption class="mt-2 text-xs text-muted">Importancia de las variables (caída de ROC-AUC por permutación).</figcaption>
+          </figure>
+          <figure class="min-w-0">
+            <a href="outputs/figures/10_fluidez_horas_uso_activo.png" target="_blank" rel="noopener" class="block overflow-hidden rounded-lg border border-line bg-plate p-2 hover:border-accent">
+              <img src="outputs/figures/10_fluidez_horas_uso_activo.png" alt="Líneas de tasa de fluidez por horas de estudio según cuartil de uso activo" loading="lazy" class="w-full">
+            </a>
+            <figcaption class="mt-2 text-xs text-muted">Más práctica activa, más fluidez con las mismas horas.</figcaption>
+          </figure>
+          <figure class="min-w-0">
+            <a href="outputs/figures/06_matriz_correlacion.png" target="_blank" rel="noopener" class="block overflow-hidden rounded-lg border border-line bg-plate p-2 hover:border-accent">
+              <img src="outputs/figures/06_matriz_correlacion.png" alt="Matriz de correlación de Spearman entre todas las variables" loading="lazy" class="w-full">
+            </a>
+            <figcaption class="mt-2 text-xs text-muted">Matriz de correlación de Spearman.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Enlaces -->
+      <footer class="flex flex-wrap items-center justify-between gap-4 border-t border-line bg-accent-soft p-6 sm:px-8">
+        <p class="font-mono text-xs text-muted">Python · pandas · matplotlib · seaborn · scikit-learn</p>
+        <div class="flex flex-wrap gap-3">
+          <a href="https://github.com/MarleneDev1/analisis-datos-kaggle/blob/HEAD/eda_language_learning.py" target="_blank" rel="noopener"
+             class="rounded-md border border-line bg-surface px-4 py-2 text-sm font-semibold text-ink hover:border-accent">Ver el código</a>
+          <a href="https://github.com/MarleneDev1/analisis-datos-kaggle" target="_blank" rel="noopener"
+             class="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-surface hover:opacity-90">Repositorio en GitHub ↗</a>
+        </div>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="flex flex-wrap justify-between gap-2 border-t border-line py-8 font-mono text-xs text-muted">
+    <span>© 2026 Marlene</span>
+    <a href="https://github.com/MarleneDev1" target="_blank" rel="noopener" class="hover:text-ink">github.com/MarleneDev1</a>
+  </footer>
+</div>
+
+<script>
+  // Datos calculados en eda_language_learning.py (tasas por categoría FSI)
+  const DATA = [
+    { fsi: 1, n: 15202, fluent: 54.1, dropout: 23.4 },
+    { fsi: 2, n: 9055,  fluent: 42.1, dropout: 31.2 },
+    { fsi: 3, n: 11892, fluent: 27.0, dropout: 42.1 },
+    { fsi: 4, n: 8851,  fluent: 9.5,  dropout: 59.7 },
+  ];
+  const Y_MAX = 60;
+  const SERIES = [
+    { key: "fluent", label: "Llegan a B2 o más", cls: "bg-fluent" },
+    { key: "dropout", label: "Abandonan", cls: "bg-dropout" },
+  ];
+  const fmt = (v) => v.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
+
+  const chart = document.getElementById("chart");
+  const xAxis = document.getElementById("chart-x");
+  const table = document.getElementById("chart-table");
+  const tip = document.getElementById("tooltip");
+  const wrap = document.getElementById("chart-wrap");
+
+  DATA.forEach((d) => {
+    const group = document.createElement("div");
+    group.className = "flex h-full flex-1 items-end justify-center gap-[2px]";
+    SERIES.forEach((s) => {
+      const bar = document.createElement("div");
+      bar.className = `bar ${s.cls} w-full max-w-10`;
+      bar.style.height = (d[s.key] / Y_MAX) * 100 + "%";
+      bar.tabIndex = 0;
+      bar.setAttribute("aria-label", `FSI ${d.fsi}, ${s.label}: ${fmt(d[s.key])}`);
+      bar.dataset.tip = `<div class="font-semibold text-ink">FSI ${d.fsi}</div><div class="text-muted">${s.label}</div><div class="num font-mono text-ink">${fmt(d[s.key])}</div>`;
+      group.appendChild(bar);
+    });
+    chart.appendChild(group);
+
+    const x = document.createElement("span");
+    x.className = "flex-1 text-center";
+    x.textContent = "FSI " + d.fsi;
+    xAxis.appendChild(x);
+
+    const row = document.createElement("tr");
+    row.className = "border-b border-line";
+    row.innerHTML = `<td class="py-2 pr-4">${d.fsi}</td><td class="py-2 pr-4">${d.n.toLocaleString("es-ES")}</td><td class="py-2 pr-4">${fmt(d.fluent)}</td><td class="py-2">${fmt(d.dropout)}</td>`;
+    table.appendChild(row);
+  });
+
+  function showTip(bar) {
+    tip.innerHTML = bar.dataset.tip;
+    tip.hidden = false;
+    const w = wrap.getBoundingClientRect();
+    const b = bar.getBoundingClientRect();
+    const left = Math.min(Math.max(b.left - w.left + b.width / 2 - tip.offsetWidth / 2, 0), w.width - tip.offsetWidth);
+    tip.style.left = left + "px";
+    tip.style.top = Math.max(b.top - w.top - tip.offsetHeight - 8, 0) + "px";
+  }
+  chart.querySelectorAll(".bar").forEach((bar) => {
+    bar.addEventListener("mouseenter", () => showTip(bar));
+    bar.addEventListener("focus", () => showTip(bar));
+    bar.addEventListener("mouseleave", () => (tip.hidden = true));
+    bar.addEventListener("blur", () => (tip.hidden = true));
+  });
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@ data/
   language_learning_fluency.csv   # 45.000 filas x 18 columnas
   data_dictionary_language.csv    # descripción de cada columna
 eda_language_learning.py          # script del EDA
+index.html                        # portafolio web (Tailwind CSS vía CDN)
 outputs/
   figures/                        # 13 gráficos PNG
   tables/                         # tablas de resultados en CSV
@@ -22,6 +23,10 @@ python eda_language_learning.py
 ```
 
 El script imprime el análisis en consola y regenera `outputs/`. Tarda unos 20 s.
+
+## Portafolio web
+
+`index.html` es una página de portafolio responsiva, con modo claro y oscuro, hecha con Tailwind CSS vía CDN. Incluye una presentación sobre mí y una tarjeta de este proyecto con métricas, una gráfica interactiva y las figuras de `outputs/figures/`. Para verla, abre el archivo en el navegador o publícala con GitHub Pages desde la raíz de `main`.
 
 ## Contenido del EDA
 
