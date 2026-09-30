@@ -133,7 +133,7 @@ print(f"IDs duplicados: {df[ID_COL].duplicated().sum()}")
 
 plt.figure(figsize=(10, 4))
 sns.heatmap(df.isna().T, cbar=False, cmap="viridis", yticklabels=True, xticklabels=False)
-plt.title("Mapa de valores faltantes (amarillo = faltante)")
+plt.title("Missing values map (yellow = missing)")
 save_fig("01_mapa_faltantes")
 
 # Rangos esperados según el diccionario de datos
@@ -207,7 +207,7 @@ for ax, col in zip(axes.flat, numeric_cols):
     ax.set_xlabel("")
 for ax in axes.flat[n:]:
     ax.set_visible(False)
-fig.suptitle("Distribución de variables numéricas", y=1.01, fontsize=14)
+fig.suptitle("Distribution of numeric variables", y=1.01, fontsize=14)
 plt.tight_layout()
 save_fig("02_histogramas_numericas")
 
@@ -218,7 +218,7 @@ for ax, col in zip(axes.flat, numeric_cols):
     ax.set_xlabel("")
 for ax in axes.flat[n:]:
     ax.set_visible(False)
-fig.suptitle("Boxplots (detección de outliers)", y=1.01, fontsize=14)
+fig.suptitle("Boxplots (outlier detection)", y=1.01, fontsize=14)
 plt.tight_layout()
 save_fig("03_boxplots_numericas")
 
@@ -249,23 +249,23 @@ print(ct)
 # Resultado combinado en 3 clases (más interpretable que dos binarias)
 df["outcome"] = np.select(
     [df["reached_fluency"] == 1, df["dropped_out"] == 1],
-    ["fluido", "abandono"],
-    default="en_progreso",
+    ["fluent", "dropped"],
+    default="in_progress",
 )
 print("\nResultado combinado:")
 print(df["outcome"].value_counts(normalize=True).round(3))
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 4.5))
 cefr_outcome = pd.crosstab(df["cefr_level"], df["outcome"], normalize="index").reindex(CEFR_ORDER)
-cefr_outcome[["fluido", "en_progreso", "abandono"]].plot(
+cefr_outcome[["fluent", "in_progress", "dropped"]].plot(
     kind="bar", stacked=True, ax=axes[0], color=["#2a9d8f", "#e9c46a", "#e76f51"])
-axes[0].set_title("Resultado por nivel CEFR")
-axes[0].set_ylabel("Proporción")
+axes[0].set_title("Outcome by CEFR level")
+axes[0].set_ylabel("Share")
 axes[0].legend(title="outcome", bbox_to_anchor=(1, 1))
 fsi_rates = df.groupby("fsi_category")[TARGETS].mean()
 fsi_rates.plot(kind="bar", ax=axes[1], color=["#2a9d8f", "#e76f51"])
-axes[1].set_title("Tasa de fluidez y abandono por dificultad FSI")
-axes[1].set_ylabel("Tasa")
+axes[1].set_title("Fluency and dropout rate by FSI difficulty")
+axes[1].set_ylabel("Rate")
 plt.tight_layout()
 save_fig("05_objetivos")
 
@@ -281,7 +281,7 @@ plt.figure(figsize=(13, 11))
 mask = np.triu(np.ones_like(corr, dtype=bool), k=1)
 sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="RdBu_r", center=0,
             vmin=-1, vmax=1, annot_kws={"size": 7}, linewidths=0.4)
-plt.title("Matriz de correlación (Spearman)")
+plt.title("Correlation matrix (Spearman)")
 save_fig("06_matriz_correlacion")
 
 target_corr = corr[TARGETS + ["cefr_ordinal"]].drop(TARGETS + ["cefr_ordinal"])
@@ -304,7 +304,7 @@ for ax, target in zip(axes, TARGETS):
     colors = ["#2a9d8f" if v > 0 else "#e76f51" for v in s]
     ax.barh(s.index, s.values, color=colors)
     ax.axvline(0, color="black", lw=0.8)
-    ax.set_title(f"Correlación con {target}")
+    ax.set_title(f"Correlation with {target}")
 axes[0].invert_yaxis()
 plt.tight_layout()
 save_fig("07_correlacion_objetivos")
@@ -318,9 +318,9 @@ key_numeric = ["total_study_hours", "comprehensible_input_hours", "active_use_sh
 
 fig, axes = plt.subplots(2, 3, figsize=(16, 8))
 for ax, col in zip(axes.flat, key_numeric):
-    sns.boxplot(data=df, x="outcome", y=col, order=["abandono", "en_progreso", "fluido"],
-                hue="outcome", palette={"fluido": "#2a9d8f", "en_progreso": "#e9c46a",
-                                        "abandono": "#e76f51"},
+    sns.boxplot(data=df, x="outcome", y=col, order=["dropped", "in_progress", "fluent"],
+                hue="outcome", palette={"fluent": "#2a9d8f", "in_progress": "#e9c46a",
+                                        "dropped": "#e76f51"},
                 legend=False, ax=ax, fliersize=1)
     ax.set_title(col)
     ax.set_xlabel("")
@@ -340,16 +340,16 @@ plt.figure(figsize=(10, 5))
 for fsi in pivot.columns:
     plt.plot(range(len(pivot)), pivot[fsi], marker="o", label=f"FSI {fsi}")
 plt.xticks(range(len(pivot)), [str(i) for i in pivot.index], rotation=45, ha="right")
-plt.ylabel("Tasa de fluidez (>= B2)")
-plt.xlabel("Deciles de total_study_hours")
-plt.title("Fluidez vs horas de estudio según dificultad del idioma")
+plt.ylabel("Fluency rate (>= B2)")
+plt.xlabel("total_study_hours deciles")
+plt.title("Fluency vs study hours by language difficulty")
 plt.legend()
 save_fig("09_fluidez_horas_fsi")
 print("\nTasa de fluidez por decil de horas x FSI:")
 print(pivot.round(2))
 
 # Efecto de la calidad del estudio: active_use_share en cuartiles
-df["active_q"] = pd.qcut(df["active_use_share"], 4, labels=["Q1 bajo", "Q2", "Q3", "Q4 alto"])
+df["active_q"] = pd.qcut(df["active_use_share"], 4, labels=["Q1 low", "Q2", "Q3", "Q4 high"])
 pivot_active = df.pivot_table(index="horas_bin", columns="active_q",
                               values="reached_fluency", aggfunc="mean", observed=True)
 plt.figure(figsize=(10, 5))
@@ -358,9 +358,9 @@ for q in pivot_active.columns:
 plt.xticks(range(len(pivot_active)), [str(i) for i in pivot_active.index],
            rotation=45, ha="right")
 plt.legend(title="active_use_share")
-plt.title("Fluidez vs horas de estudio según cuartil de uso activo")
-plt.ylabel("Tasa de fluidez")
-plt.xlabel("Deciles de total_study_hours")
+plt.title("Fluency vs study hours by active-use quartile")
+plt.ylabel("Fluency rate")
+plt.xlabel("total_study_hours deciles")
 save_fig("10_fluidez_horas_uso_activo")
 
 # Abandono vs motivación y consistencia
@@ -371,7 +371,7 @@ for ax, col in zip(axes, ["motivation", "consistency"]):
     ax.plot(range(len(rate)), rate.values, marker="o", color="#e76f51")
     ax.set_xticks(range(len(rate)))
     ax.set_xticklabels([f"{i.mid:.1f}" for i in rate.index])
-    ax.set_title(f"Tasa de abandono vs {col}")
+    ax.set_title(f"Dropout rate vs {col}")
     ax.set_ylabel("dropped_out")
 plt.tight_layout()
 save_fig("11_abandono_motivacion_consistencia")
@@ -388,11 +388,11 @@ ax1.set_ylabel("accent_nativelike (0-10)")
 ax2 = ax1.twinx()
 ax2.plot(age_eff.index.astype(str), age_eff["reached_fluency"], marker="s", color="#2a9d8f",
          label="reached_fluency")
-ax2.set_ylabel("Tasa de fluidez")
+ax2.set_ylabel("Fluency rate")
 ax2.set_ylim(0, 1)
 ax2.grid(False)
 fig.legend(loc="upper right", bbox_to_anchor=(0.9, 0.88))
-plt.title("Edad de inicio: acento vs fluidez")
+plt.title("Starting age: accent vs fluency")
 save_fig("12_edad_acento_fluidez")
 
 # ---------------------------------------------------------------------------
@@ -439,8 +439,8 @@ fig, axes = plt.subplots(1, 2, figsize=(15, 6))
 for ax, target in zip(axes, TARGETS):
     imp = importance[target].sort_values("permutation_auc")
     ax.barh(imp.index, imp["permutation_auc"], color="#264653")
-    ax.set_title(f"Importancia por permutación (caída de AUC)\nobjetivo: {target}")
-    ax.set_xlabel("Disminución media de ROC-AUC")
+    ax.set_title(f"Permutation importance (AUC drop)\ntarget: {target}")
+    ax.set_xlabel("Mean decrease in ROC-AUC")
 plt.tight_layout()
 save_fig("13_importancia_variables")
 
@@ -454,7 +454,7 @@ print(f"- {df.shape[0]:,} registros, {df.shape[1] - 5} columnas originales, "
       f"{int(df[feature_cols].isna().sum().sum())} valores faltantes, 0 duplicados.")
 print(f"- Fluidez alcanzada: {df['reached_fluency'].mean():.1%} | "
       f"Abandono: {df['dropped_out'].mean():.1%} | "
-      f"En progreso: {(df['outcome'] == 'en_progreso').mean():.1%}")
+      f"En progreso: {(df['outcome'] == 'in_progress').mean():.1%}")
 print(f"- Top 5 variables para reached_fluency: {top_fluency}")
 print(f"- Top 5 variables para dropped_out:     {top_dropout}")
 print("- cefr_level determina reached_fluency (>=B2): no usar como predictor.")
