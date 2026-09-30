@@ -26,7 +26,7 @@ El script imprime el análisis en consola y regenera `outputs/`. Tarda unos 20 s
 
 ## Portafolio web
 
-`index.html` es una página de portafolio responsiva, con modo claro y oscuro, hecha con Tailwind CSS vía CDN. Incluye una presentación sobre mí y una tarjeta de este proyecto con métricas, una gráfica interactiva y las figuras de `outputs/figures/`. Para verla, abre el archivo en el navegador o publícala con GitHub Pages desde la raíz de `main`.
+`index.html` es mi portafolio en inglés: una página responsiva de tema oscuro (negro, gris, violeta y rosa) hecha con Tailwind CSS vía CDN. Incluye una presentación, este proyecto contado como caso de estudio (métricas, gráfica interactiva, hallazgos y figuras de `outputs/figures/`), mis habilidades y enlaces a LinkedIn y GitHub. Para verla, abre el archivo en el navegador o publícala con GitHub Pages desde la raíz de `main`.
 
 ## Contenido del EDA
 
