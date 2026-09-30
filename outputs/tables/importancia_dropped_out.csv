@@ -1,0 +1,14 @@
+,mutual_info,rf_gini,permutation_auc,rank_medio
+fsi_category,0.038,0.21051,0.09782,1.66667
+total_study_hours,0.04882,0.2013,0.07862,1.66667
+active_use_share,0.01769,0.1323,0.0515,3.33333
+comprehensible_input_hours,0.04497,0.13076,0.01355,4.33333
+motivation,0.01232,0.084,0.01931,5.0
+immersion_months,0.01022,0.05646,0.02161,5.66667
+consistency,0.00854,0.08031,0.01686,6.33333
+speaking_practice,0.00412,0.03353,0.00091,8.66667
+feedback_quality,0.0,0.03313,0.00226,10.0
+age_started,0.00111,0.02115,0.00015,10.0
+related_language,0.00105,0.00618,0.0012,10.33333
+prior_languages,0.00107,0.00599,0.0,11.66667
+uses_srs,7e-05,0.00438,9e-05,12.33333
