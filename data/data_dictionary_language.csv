@@ -1,0 +1,19 @@
+column,type,description
+learner_id,string,Unique learner id
+fsi_category,int,Target-language difficulty (FSI 1=easy like Spanish .. 4=hard like Mandarin/Arabic)
+related_language,int,1 if the learner knows a language related to the target (cuts time)
+prior_languages,int,Number of languages already known
+age_started,int,"Age when the learner started (affects accent ceiling, NOT attainable fluency)"
+total_study_hours,int,Total study hours (the biggest single lever)
+active_use_share,float,QUALITY: fraction of study that is active use/output vs passive review (0-1)
+immersion_months,float,QUALITY: months living/using the language immersively
+speaking_practice,float,QUALITY: speaking/output practice (0-10)
+feedback_quality,float,"QUALITY: corrective feedback quality, e.g. a tutor (0-10)"
+comprehensible_input_hours,int,Hours of comprehensible input (listening/reading)
+uses_srs,int,1 if uses spaced repetition
+motivation,float,Motivation (0-10)
+consistency,float,Practice consistency (0-10)
+accent_nativelike,float,"How native-like the accent is (0-10) — age-sensitive, separate from fluency"
+cefr_level,string,Attained CEFR level (A0..C2)
+reached_fluency,int,TARGET (binary): 1 if reached B2 or above (~36%)
+dropped_out,int,TARGET (binary): 1 if quit before reaching B2 (~37%)
