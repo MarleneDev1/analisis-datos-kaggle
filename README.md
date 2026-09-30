@@ -1,6 +1,6 @@
 # Análisis de datos Kaggle: Language Learning Fluency
 
-EDA (análisis exploratorio de datos) de un dataset de 45.000 personas que aprenden idiomas. El objetivo es entender qué factores explican que alguien **alcance la fluidez** (`reached_fluency`, nivel ≥ B2) o **abandone** (`dropped_out`).
+EDA (análisis exploratorio de datos) de un dataset de 45.000 personas que aprenden idiomas. El objetivo es entender qué factores explican que alguien **alcan (`reached_fluency`, nivel ≥ B2) o **abandone** (`dropped_out`).
 
 ## Estructura
 
