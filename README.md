@@ -68,3 +68,4 @@ Un Random Forest con estas variables obtiene un accuracy de **0,89** para fluide
 - **Motivación y consistencia** no predicen la fluidez (ρ ≈ 0), pero sí el **abandono**.
 - **Edad de inicio**: no influye en la fluidez (≈ 36 % en todos los rangos de edad), pero sí en el acento. `accent_nativelike` baja de 8,0 (inicio antes de los 12 años) a 3,1 (inicio después de los 45).
 - `uses_srs`, `prior_languages` y `related_language` tienen un efecto casi nulo.
+
